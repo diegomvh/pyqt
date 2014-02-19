@@ -1,0 +1,4 @@
+pyqt
+====
+
+PyQt resources.
