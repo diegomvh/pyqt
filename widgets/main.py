@@ -4,11 +4,12 @@ import sys
 
 from PyQt4 import QtGui
 
-from locator import LocatorWidget
+from locator import LocatorWidget, TestCommand
 
 def main(args = None):
     app = QtGui.QApplication(sys.argv)
     locator = LocatorWidget()
+    locator.addCommand(TestCommand(locator))
     locator.show()
     return app.exec_()
 
