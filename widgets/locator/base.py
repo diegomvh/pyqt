@@ -16,13 +16,3 @@ class LocatorWidget(QtGui.QWidget):
         self.layout().addWidget(self._line_edit)
         self.setFocusProxy(self._line_edit)
         self._line_edit.setFocus()
-
-def main(args = None):
-    app = QtGui.QApplication(sys.argv)
-    locator = LocatorWidget()
-    locator.show()
-    return app.exec_()
-
-if __name__ == '__main__':
-    import sys
-    sys.exit(main(sys.argv))
