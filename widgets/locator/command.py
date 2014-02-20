@@ -30,10 +30,10 @@ class TestCommand(AbstractCommand):
         return "Test Command"
     
     def pattern(self):
-        return re.compile("t\s+(\w*)")
+        return re.compile("t\s+([\w/\.]*)")
     
     def completer(self, match, position):
-        print(match.groups())
+        print(match.string, match.groups(), position)
         return makeSuitableCompleter(match.groups()[0], position)
 
     def execute(self, match):

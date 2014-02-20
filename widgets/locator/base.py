@@ -12,15 +12,22 @@ class _CompleterModel(QtCore.QAbstractListModel):
         QtCore.QAbstractListModel.__init__(self, parent)
         self.completer = None
     
+    def headerData(self, index, orientation, role):
+        if self.completer is not None and role == QtCore.Qt.DisplayRole:
+            if orientation == QtCore.Qt.Horizontal:
+                return self.completer.horizontalHeader()
+            else:
+                return self.completer.verticalHeader()
+
     def rowCount(self, index):
-        """QAbstractItemModel method implementation"""
+        """QAbstractListModel method implementation"""
         if self.completer is None:
             return 0
 
         return self.completer.rowCount()
     
     def data(self, index, role):
-        """QAbstractItemModel method implementation"""
+        """QAbstractListModel method implementation"""
         if self.completer is not None:
             if role == QtCore.Qt.DisplayRole:
                 return self.completer.display(index.row())
@@ -67,14 +74,30 @@ class LocatorWidget(QtGui.QWidget):
         # Input completer
         self._completer_model = _CompleterModel(self)
         self._completer = QtGui.QCompleter(self._completer_model, self)
-        self._completer.setPopup(QtGui.QListView(self))
+        self._completer.setPopup(QtGui.QTableView(self))
         self._completer.popup().setItemDelegate(
                         HtmlItemDelegate(self._completer.popup()))
+        self._completer.popup().verticalHeader().setVisible(False)
+        self._completer.popup().horizontalHeader().setVisible(False)
+        self._completer.popup().horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Stretch)
+        self._completer.popup().setShowGrid(False)
+        self._completer.popup().setMinimumHeight(200)
+        self._completer.popup().setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self._completer.popup().setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self._completer.popup().setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+
         self._completer.popup().setAlternatingRowColors(True)
         self._completer.popup().setAlternatingRowColors(True)
         self._completer.setWidget(self._line_edit)
         
         self._line_edit.setFocus()
+
+    # -------- Set and bind completer to completer modelReset
+    def complete(self, completer):
+        self._completer_model.setCompleter(completer)
+        self._completer.popup().verticalHeader().setVisible(completer.hasVerticalHeader())
+        self._completer.popup().horizontalHeader().setVisible(completer.hasHorizontalHeader())
+        self._completer.complete()
         
     # -------- Signals
     def _on_line_edit_textChanged(self, text):
@@ -88,9 +111,8 @@ class LocatorWidget(QtGui.QWidget):
                 completer = _HelpCompleter([ command ])
         else:
             completer = _HelpCompleter(self._commands)
-
-        self._completer_model.setCompleter(completer)
-        self._completer.complete()    
+    
+        self.complete(completer)
     
     # -------- Command tools
     def _parse_command(self, text):

@@ -12,7 +12,13 @@ class AbstractCompleter(QtCore.QObject):
     def decoration(self, row):
         """Icon for list item. Default is None"""
         return None
-
+    
+    def hasHorizontalHeader(self):
+        return False
+    
+    def hasVerticalHeader(self):
+        return False
+    
 class TestCompleter(AbstractCompleter):
     def __init__(self, parent = None):
         AbstractCompleter.__init__(self, parent)

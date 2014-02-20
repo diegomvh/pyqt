@@ -29,7 +29,6 @@ class AbstractPathCompleter(AbstractCompleter):
     _fsModel = QtGui.QFileSystemModel()
 
     _ERROR = 'error'
-    _HEADER = 'currentDir'
     _STATUS = 'status'
     _DIRECTORY = 'directory'
     _FILE = 'file'
@@ -49,17 +48,12 @@ class AbstractPathCompleter(AbstractCompleter):
                         not filterRegExp.match(path)]
 
     def _classifyRowIndex(self, row):
-        """Get list item type and index by it's row
-        """
+        """Get list item type and index by it's row"""
 
         if self._error:
             assert row == 0
             return (self._ERROR, 0)
         
-        if row == 0:
-            return (self._HEADER, 0)
-        
-        row -= 1
         if self._status:
             if row == 0:
                 return (self._STATUS, 0)
@@ -74,24 +68,20 @@ class AbstractPathCompleter(AbstractCompleter):
         
         assert False
 
-    def _formatHeader(self, text):
-        """Format current directory for show it in the list of completions"""
-        return '<font style="background-color: %s; color: %s">%s</font>' % \
-                (QtGui.QApplication.instance().palette().color(QtGui.QPalette.Window).name(),
-                 QtGui.QApplication.instance().palette().color(QtGui.QPalette.WindowText).name(),
-                 htmlEscape(text))
+    def hasHorizontalHeader(self):
+        return True
+        
+    def horizontalHeader(self):
+        return self._headerText()
 
     def rowCount(self):
-        """Row count in the list of completions
-        """
+        """Row count in the list of completions"""
         if self._error:
             return 1
         else:
-            count = 1  # current directory
+            count = len(self._dirs) + len(self._files)
             if self._status:
                 count += 1
-            count += len(self._dirs)
-            count += len(self._files)
             return count
 
     @staticmethod
@@ -105,8 +95,6 @@ class AbstractPathCompleter(AbstractCompleter):
         rowType, index = self._classifyRowIndex(row)
         if rowType == self._ERROR:
             return '<font color=red>%s</font>' % htmlEscape(self._error)
-        elif rowType == self._HEADER:
-            return self._formatHeader(self._headerText())
         elif rowType == self._STATUS:
             return '<i>%s</i>' % htmlEscape(self._status)
         elif rowType == self._DIRECTORY:
@@ -119,15 +107,12 @@ class AbstractPathCompleter(AbstractCompleter):
         rowType, index = self._classifyRowIndex(row)
         if rowType == self._ERROR:
             return QtGui.QApplication.instance().style().standardIcon(QtGui.QStyle.SP_MessageBoxCritical)
-        elif rowType == self._HEADER:
-            return None
         elif rowType == self._STATUS:
             return None
         elif rowType == self._DIRECTORY:
             return self._iconForPath(self._dirs[index])
         elif rowType == self._FILE:
             return self._iconForPath(self._files[index])
-
 
 class PathCompleter(AbstractPathCompleter):
     """Path completer for Locator. Supports globs
