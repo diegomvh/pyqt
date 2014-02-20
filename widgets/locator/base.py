@@ -23,10 +23,9 @@ class _CompleterModel(QtCore.QAbstractListModel):
         """QAbstractItemModel method implementation"""
         if self.completer is not None:
             if role == QtCore.Qt.DisplayRole:
-                print(self.completer.text(index.row()))
-                return self.completer.text(index.row())
+                return self.completer.display(index.row())
             elif role == QtCore.Qt.DecorationRole:
-                return self.completer.icon(index.row())
+                return self.completer.decoration(index.row())
     
     def setCompleter(self, completer):
         """Set completer, which will be used as data source"""
@@ -41,7 +40,7 @@ class _HelpCompleter(AbstractCompleter):
     def rowCount(self):
         return len(self._commands)
     
-    def text(self, row):
+    def display(self, row):
         c = self._commands[row]
         return self._template % (
             htmlEscape(c.signature()),
@@ -71,6 +70,8 @@ class LocatorWidget(QtGui.QWidget):
         self._completer.setPopup(QtGui.QListView(self))
         self._completer.popup().setItemDelegate(
                         HtmlItemDelegate(self._completer.popup()))
+        self._completer.popup().setAlternatingRowColors(True)
+        self._completer.popup().setAlternatingRowColors(True)
         self._completer.setWidget(self._line_edit)
         
         self._line_edit.setFocus()

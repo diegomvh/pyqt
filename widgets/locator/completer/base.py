@@ -5,11 +5,11 @@ class AbstractCompleter(QtCore.QObject):
         """Row count for list"""
         raise NotImplemented()
     
-    def text(self, row):
+    def display(self, row):
         """Text for list item"""
         raise NotImplemented()
     
-    def icon(self, row):
+    def decoration(self, row):
         """Icon for list item. Default is None"""
         return None
 
@@ -21,9 +21,9 @@ class TestCompleter(AbstractCompleter):
     def rowCount(self):
         return len(self.words)
     
-    def text(self, row):
+    def display(self, row):
         return self.words[row]
     
-    def icon(self, row):
+    def decoration(self, row):
         return None
     

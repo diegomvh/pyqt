@@ -4,7 +4,7 @@ import re
 
 from PyQt4 import QtCore, QtGui
 
-from .completer import TestCompleter
+from .completer import makeSuitableCompleter
 
 class AbstractCommand(QtCore.QObject):
     def signature(self):
@@ -34,7 +34,7 @@ class TestCommand(AbstractCommand):
     
     def completer(self, match, position):
         print(match.groups())
-        return TestCompleter(self)
+        return makeSuitableCompleter(match.groups()[0], position)
 
     def execute(self, match):
         print("testing")
