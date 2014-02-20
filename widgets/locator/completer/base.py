@@ -19,16 +19,30 @@ class AbstractCompleter(QtCore.QObject):
     def hasVerticalHeader(self):
         return False
     
-class TestCompleter(AbstractCompleter):
-    def __init__(self, parent = None):
+class WordsCompleter(AbstractCompleter):
+    def __init__(self, words, parent = None):
         AbstractCompleter.__init__(self, parent)
-        self.words = ["one", "two", "three", "four"]
+        self.words = words
     
     def rowCount(self):
         return len(self.words)
     
     def display(self, row):
         return self.words[row]
+    
+    def decoration(self, row):
+        return None
+        
+class RangeCompleter(AbstractCompleter):
+    def __init__(self, numbers, parent = None):
+        AbstractCompleter.__init__(self, parent)
+        self.numbers = numbers
+
+    def rowCount(self):
+        return len(self.numbers)
+    
+    def display(self, row):
+        return self.numbers[row]
     
     def decoration(self, row):
         return None

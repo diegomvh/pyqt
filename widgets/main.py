@@ -9,11 +9,11 @@ sip.setapi('QString', 2)
 def main(args = None):
     
     from PyQt4 import QtGui
-    from locator import LocatorWidget, TestCommand
+    from locator import LocatorWidget, OpenCommand
     
     app = QtGui.QApplication(sys.argv)
     locator = LocatorWidget()
-    locator.addCommand(TestCommand(locator))
+    locator.addCommand(OpenCommand(locator))
     locator.show()
     return app.exec_()
 

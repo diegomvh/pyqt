@@ -4,7 +4,7 @@ import re
 
 from PyQt4 import QtCore, QtGui
 
-from .completer import makeSuitableCompleter
+from .completer import makeSuitableCompleter, RangeCompleter
 
 class AbstractCommand(QtCore.QObject):
     def signature(self):
@@ -22,19 +22,26 @@ class AbstractCommand(QtCore.QObject):
     def execute(self, match):
         raise NotImplemented()
 
-class TestCommand(AbstractCommand):
+import os
+
+class OpenCommand(AbstractCommand):
     def signature(self):
-        return "t word"
+        return "o <path> [line]"
     
     def description(self):
-        return "Test Command"
+        return "Open file and go to line number"
     
     def pattern(self):
-        return re.compile("t\s+([\w/\.]*)")
+        return re.compile("o\s+([\w/\.-]*)\s*(\d*)")
     
     def completer(self, match, position):
         print(match.string, match.groups(), position)
-        return makeSuitableCompleter(match.groups()[0], position)
+        if match.span(1)[0] <= position <= match.span(1)[1]:
+            return makeSuitableCompleter(match.groups()[0], position)
+        if match.span(2)[0] <= position <= match.span(2)[1]:
+            path = match.group(1)
+            if os.path.isfile(path):
+                return RangeCompleter(range(len(open(path).readlines())))
 
     def execute(self, match):
         print("testing")
