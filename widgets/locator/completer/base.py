@@ -1,6 +1,9 @@
 from PyQt4 import QtCore, QtGui
 
 class AbstractCompleter(QtCore.QObject):
+    def __init__(self, parent = None):
+        QtCore.QObject.__init__(self, parent)
+        
     def rowCount(self):
         """Row count for list"""
         raise NotImplemented()
@@ -16,8 +19,14 @@ class AbstractCompleter(QtCore.QObject):
     def hasHorizontalHeader(self):
         return False
     
+    def horizontalHeader(self):
+        return None
+    
     def hasVerticalHeader(self):
         return False
+    
+    def verticalHeader(self, row):
+        return None
     
 class WordsCompleter(AbstractCompleter):
     def __init__(self, words, parent = None):

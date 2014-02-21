@@ -17,7 +17,7 @@ class _CompleterModel(QtCore.QAbstractListModel):
             if orientation == QtCore.Qt.Horizontal:
                 return self.completer.horizontalHeader()
             else:
-                return self.completer.verticalHeader()
+                return self.completer.verticalHeader(index)
 
     def rowCount(self, index):
         """QAbstractListModel method implementation"""
@@ -81,13 +81,14 @@ class LocatorWidget(QtGui.QWidget):
         self._completer.popup().horizontalHeader().setVisible(False)
         self._completer.popup().horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Stretch)
         self._completer.popup().setShowGrid(False)
-        self._completer.popup().setMinimumHeight(200)
+        self._completer.popup().setAlternatingRowColors(True)
         self._completer.popup().setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self._completer.popup().setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self._completer.popup().setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-
-        self._completer.popup().setAlternatingRowColors(True)
-        self._completer.popup().setAlternatingRowColors(True)
+        
+        # TODO ? Activated ?
+        self._completer.popup().clicked.connect(self._on_popup_view_clicked)
+        
         self._completer.setWidget(self._line_edit)
         
         self._line_edit.setFocus()
@@ -97,9 +98,18 @@ class LocatorWidget(QtGui.QWidget):
         self._completer_model.setCompleter(completer)
         self._completer.popup().verticalHeader().setVisible(completer.hasVerticalHeader())
         self._completer.popup().horizontalHeader().setVisible(completer.hasHorizontalHeader())
+        self._completer.popup().resizeRowsToContents()
         self._completer.complete()
+        if completer.hasHorizontalHeader():
+            size = self._completer.popup().size()
+            size.setHeight(size.height() + self._completer.popup().horizontalHeader().height())
+            self._completer.popup().resize(size)
+        
         
     # -------- Signals
+    def _on_popup_view_clicked(self, index):
+        print(index)
+        
     def _on_line_edit_textChanged(self, text):
         current_completer = None
         

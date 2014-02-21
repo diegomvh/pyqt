@@ -34,6 +34,7 @@ class AbstractPathCompleter(AbstractCompleter):
     _FILE = 'file'
     
     def __init__(self, text):
+        AbstractCompleter.__init__(self)
         self._originalText = text
         self._dirs = []
         self._files = []
