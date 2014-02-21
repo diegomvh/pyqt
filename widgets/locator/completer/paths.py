@@ -5,12 +5,13 @@ from PyQt4 import QtCore, QtGui
 import os
 import os.path
 import glob
+import re
+import fnmatch
+from functools import reduce
 
 from ..delegate import htmlEscape
 from .base import AbstractCompleter
 
-import fnmatch
-import re
 regExPatterns = [fnmatch.translate(f) for f in ['*.pyc']]
 compositeRegExpPattern = '(' + ')|('.join(regExPatterns) + ')'
 filterRegExp = re.compile(compositeRegExpPattern)
@@ -142,7 +143,7 @@ class PathCompleter(AbstractPathCompleter):
 
         try:
             filesAndDirs = os.listdir(self._path)
-        except OSError, ex:
+        except OSError as ex:
             self._error = unicode(str(ex), 'utf8')
             return
         
