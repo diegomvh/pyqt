@@ -28,6 +28,11 @@ class AbstractCompleter(QtCore.QObject):
     def verticalHeader(self, row):
         return None
     
+    def inline(self):
+        """Inline completion.
+        Shown after cursor. Appedned to the typed text, if Tab is pressed"""
+        return None
+    
 class WordsCompleter(AbstractCompleter):
     def __init__(self, words, parent = None):
         AbstractCompleter.__init__(self, parent)

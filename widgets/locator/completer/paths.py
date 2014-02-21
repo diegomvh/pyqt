@@ -201,16 +201,11 @@ class PathCompleter(AbstractPathCompleter):
 
     def inline(self):
         """Inline completion. Displayed after the cursor"""
-        if self._error is not None:
-            return None
-        else:
-            if self._dirs or self._files:
-                dirs = [os.path.basename(dir) + '/' for dir in self._dirs]
-                files = [os.path.basename(file) for file in self._files]
-                commonPart = reduce(self._commonStart, dirs + files)
-                return commonPart[self._lastTypedSegmentLength():]
-            else:
-                return ''
+        if self._error is None and (self._dirs or self._files):
+            dirs = [os.path.basename(dir) + '/' for dir in self._dirs]
+            files = [os.path.basename(file) for file in self._files]
+            commonPart = reduce(self._commonStart, dirs + files)
+            return commonPart[self._lastTypedSegmentLength():]
 
 class GlobCompleter(AbstractPathCompleter):
     """Path completer for Locator. Supports globs, does not support inline completion
