@@ -89,7 +89,10 @@ class LocatorWidget(QtGui.QWidget):
         self._completer.popup().setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self._completer.popup().setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         
-        self._completer.activated[QtCore.QModelIndex].connect(self._on_completer_activated)
+        self._completer.activated[QtCore.QModelIndex].connect(
+            self._on_completer_activated)
+        self._completer.highlighted[QtCore.QModelIndex].connect(
+            self._on_completer_highlighted)
         
         self._completer.setWidget(self._line_edit)
         
@@ -134,9 +137,12 @@ class LocatorWidget(QtGui.QWidget):
         return QtGui.QWidget.eventFilter(self, obj, event)
 
     # -------- Signals
+    def _on_completer_highlighted(self, index):
+        print(index)
+
     def _on_completer_activated(self, index):
         print(index)
-        
+     
     def _on_line_edit_textChanged(self, text):
         current_completer = None
         self._current_command, match = self._parse_command(text)
