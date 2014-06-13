@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+import sys
+
+if sys.version_info[0] == 3:
+    unichr = chr
 
 from PyQt4 import QtCore, QtGui
 
@@ -33,7 +37,6 @@ class QtAwesomeCharIconPainter(object):
 
         # add some 'padding' around the icon
         drawSize = QtCore.qRound(rect.height() * options.get("scale-factor"))
-
         painter.setFont(awesome.font(drawSize))
         painter.drawText(rect, QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter, text)
         painter.restore()

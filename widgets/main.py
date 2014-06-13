@@ -24,8 +24,9 @@ def awesome_icons():
     ttf_path = os.path.abspath("../resources/fonts/fontawesome-4.1.0.ttf")
     aws.initFontAwesome(ttf_path)
 
+    codekeys = [key for key in FONTAWESOMECODES.keys()]
     def random_icon():
-        return aws.icon(random.choice(FONTAWESOMECODES.keys()))
+        return aws.icon(random.choice(codekeys))
         
     pushButton = QtGui.QPushButton( random_icon(), "" )
     class IconSize(QtCore.QObject):
