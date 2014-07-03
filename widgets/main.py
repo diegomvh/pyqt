@@ -4,6 +4,8 @@
 import sip
 sip.setapi('QString', 2)
 
+import string
+
 def locator_widget():
     from PyQt4 import QtGui
     from locator import LocatorWidget, OpenCommand
@@ -12,19 +14,20 @@ def locator_widget():
     locator.addCommand(OpenCommand(locator))
     return locator
 
-def awesome_icons():
+def glyph_icons():
     import os
     import random
     
     from PyQt4 import QtCore, QtGui
-    from awesome import QtAwesome, FONTAWESOMECODES
+    from glyph import QtGlyph
     
-    aws = QtAwesome()
+    #ttf_path = os.path.abspath("../resources/fonts/fontawesome-4.1.0.ttf")
+    ttf_path = os.path.abspath("../resources/fonts/webhostinghub-glyphs.ttf")
+    aws = QtGlyph.initGlyph(ttf_path)
 
-    ttf_path = os.path.abspath("../resources/fonts/fontawesome-4.1.0.ttf")
-    aws.initFontAwesome(ttf_path)
-
-    codekeys = [key for key in FONTAWESOMECODES.keys()]
+    codekeys = list(aws.codepoints().keys())
+    if not codekeys:
+        codekeys = list(string.uppercase)
     def random_icon():
         return aws.icon(random.choice(codekeys))
         
@@ -50,7 +53,7 @@ def main(args = None):
     app = QtGui.QApplication(sys.argv)
     
     locator = locator_widget()
-    button = awesome_icons()
+    button = glyph_icons()
     button.show()
     locator.show()
     
