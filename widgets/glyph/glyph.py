@@ -1,19 +1,14 @@
 #!/usr/bin/env python
-import sys
-
-if sys.version_info[0] == 3:
-    unichr = chr
-
 from PyQt4 import QtCore, QtGui
 
 def load_codepoints(font_name):
     name = font_name.replace("-", "_")
-    module = "codepoints.%s" % name.lower()
+    module = "glyph.codepoints.%s" % name.lower()
     try:
-        mod = __import__(module, globals(), locals(), [font_name], -1)
+        mod = __import__(module, globals(), locals(), [name], 0)
         return getattr(mod, name)
     except Exception as ex:
-	print(ex)
+        print(ex)
         return {}
 
 #The font-glyphicon painter

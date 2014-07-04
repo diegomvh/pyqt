@@ -27,7 +27,7 @@ def glyph_icons():
 
     codekeys = list(aws.codepoints().keys())
     if not codekeys:
-        codekeys = list(string.uppercase)
+        codekeys = list(string.ascii_letters)
     def random_icon():
         return aws.icon(random.choice(codekeys))
         

@@ -1,1 +1,1 @@
-from glyph import QtGlyph
+from .glyph import QtGlyph

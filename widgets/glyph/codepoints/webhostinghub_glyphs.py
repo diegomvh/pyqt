@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+import sys
+
+if sys.version_info[0] == 3:
+    unichr = chr
+
 #You can use the names on the page http://www.webhostinghub.com/glyphs/bootstrap/
 _codepoints = [
 ("icon-aaabattery", 0xf413),

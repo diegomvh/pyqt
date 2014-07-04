@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+import sys
+
+if sys.version_info[0] == 3:
+    unichr = chr
+
 #A list of all icon-names with the codepoint (unicode-value) on the right
 #You can use the names on the page http://fortawesome.github.io/Font-Awesome/design.html
 _codepoints = [
