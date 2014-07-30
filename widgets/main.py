@@ -6,8 +6,15 @@ sip.setapi('QString', 2)
 
 import string
 
-def locator_widget():
+def notification():
     from PyQt4 import QtGui
+    from notification import OverlayNotifier
+    
+    window = QtGui.QMainWindow()
+    window.notifier = OverlayNotifier(window)
+    return window
+
+def locator_widget():
     from locator import LocatorWidget, OpenCommand
     
     locator = LocatorWidget()
@@ -48,14 +55,20 @@ def glyph_icons():
     
 def main(args = None):
     import os
-    from PyQt4 import QtGui
+    from PyQt4 import QtGui, QtCore
         
     app = QtGui.QApplication(sys.argv)
     
     locator = locator_widget()
     button = glyph_icons()
+    window = notification()
     button.show()
     locator.show()
+    window.show()
+    window.notifier.showMessage("hola")
+    window.notifier.showMessage("pepe", title="hola", frmt="html", point = QtCore.QPoint(1,1), links = {
+        "pepe": lambda x:x
+    })
     
     return app.exec_()
 
