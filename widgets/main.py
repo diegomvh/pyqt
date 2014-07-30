@@ -65,10 +65,14 @@ def main(args = None):
     button.show()
     locator.show()
     window.show()
-    window.notifier.showMessage("hola")
-    window.notifier.showMessage("pepe", title="hola", frmt="html", point = QtCore.QPoint(1,1), links = {
-        "pepe": lambda x:x
-    })
+    window.notifier.message("Lorem ipsum dolor sit amet, consectetur adipisicing elit,\nsed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", title="Notification Test", timeout = None, icon = button.icon()).show()
+    window.notifier.message("Lorem ipsum dolor sit amet, consectetur adipisicing elit,\nsed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", title="Notification 2 Test", icon = button.icon()).show()
+    
+    def link_test():
+        print("yeaaa")
+    window.notifier.tooltip("Lorem ipsum dolor sit amet", title="Popup", frmt="html", point = QtCore.QPoint(1,1), links = {
+        "link": link_test
+    }).show()
     
     return app.exec_()
 
