@@ -43,6 +43,8 @@ class Notification(QtGui.QWidget):
         self.timeoutTimer.setSingleShot(True)
         
         # ---------- Animation
+        #self.shadow = QtGui.QGraphicsDropShadowEffect()
+        #self.shadow.setBlurRadius(10)
         self.goe = QtGui.QGraphicsOpacityEffect(self)
         self.setGraphicsEffect(self.goe)
         
