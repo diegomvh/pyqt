@@ -10,9 +10,11 @@ class Notification(QtGui.QWidget):
     
     def __init__(self, content, parent, timeout=None, icon=None, links=None):
         super(Notification, self).__init__(parent)
-        
+
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         
+        self.setStyleSheet("border: 1px solid; border-radius: 5px;")        
+        self.setAutoFillBackground(True)
         self.horizontalLayout = QtGui.QHBoxLayout(self)
         self.horizontalLayout.setSpacing(self.spacing)
         self.horizontalLayout.setMargin(0)
@@ -99,6 +101,16 @@ class OverlayNotifier(QtCore.QObject):
         super(OverlayNotifier, self).__init__(parent)
         parent.installEventFilter(self)
         self.notifications = []
+        self.palette = parent.palette()
+        self.palette.setColor(QtGui.QPalette.Window, QtCore.Qt.red)
+        #self.palette.setColor(QtGui.QPalette.Background, QtCore.Qt.red)
+        #self.palette.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
+        #self.palette.setColor(QtGui.QPalette.Base, QtCore.Qt.red)
+        #self.palette.setColor(QtGui.QPalette.Text, QtCore.Qt.red)
+        #self.palette.setColor(QtGui.QPalette.AlternateBase, QtCore.Qt.red)
+        #self.palette.setColor(QtGui.QPalette.Button, QtCore.Qt.red)
+        #self.palette.setColor(QtGui.QPalette.Text, QtCore.Qt.red)
+        #self.palette.setColor(QtGui.QPalette.Text, QtCore.Qt.red)
         
     def eventFilter(self, obj, event):
         if event.type() == QtCore.QEvent.Resize:
@@ -134,7 +146,9 @@ class OverlayNotifier(QtCore.QObject):
                 message += "<a href='%s'>%s</a>" % (key, key.title())
             message += "</div>"
         
-        return Notification(message, self.parent(), timeout, icon, links)
+        notification = Notification(message, self.parent(), timeout, icon, links)
+        notification.setPalette(self.palette)
+        return notification
         
     def message(self, *args, **kwargs):
         notification = self._notification(*args, **kwargs)

@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
 #Before impoort PyQt
+import os
 import sip
 sip.setapi('QString', 2)
+
+BASE_PATH = os.path.dirname(__file__)
 
 import string
 
@@ -22,14 +25,14 @@ def locator_widget():
     return locator
 
 def glyph_icons():
-    import os
     import random
     
     from PyQt4 import QtCore, QtGui
     from glyph import QtGlyph
     
     #ttf_path = os.path.abspath("../resources/fonts/fontawesome-4.1.0.ttf")
-    ttf_path = os.path.abspath("../resources/fonts/webhostinghub-glyphs.ttf")
+    ttf_path = os.path.abspath(
+        os.path.join(BASE_PATH, "../resources/fonts/webhostinghub-glyphs.ttf"))
     aws = QtGlyph.initGlyph(ttf_path)
 
     codekeys = list(aws.codepoints().keys())
