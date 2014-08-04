@@ -5,33 +5,35 @@ import collections
 from PyQt4 import QtCore, QtGui
 
 class Notification(QtGui.QWidget):
-    spacing = 2
     aboutToClose = QtCore.pyqtSignal()
-    
     def __init__(self, content, parent, timeout=None, icon=None, links=None):
         super(Notification, self).__init__(parent)
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        
-        self.setStyleSheet("border: 1px solid; border-radius: 5px;")        
-        self.setAutoFillBackground(True)
         self.horizontalLayout = QtGui.QHBoxLayout(self)
-        self.horizontalLayout.setSpacing(self.spacing)
+        self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setMargin(0)
 
-        self.pixmap = QtGui.QLabel(self)
+        # ------------------- Elements
+        self.padding = 5
+        self.border = 1
+        self.radius = 5
+        self.pixmap = None
         if icon is not None:
+            self.pixmap = QtGui.QLabel(self)
             self.pixmap.setPixmap(icon.pixmap(
                 QtCore.QSize(
                     self.pixmap.height(),
                     self.pixmap.height()
                 )
             ))
-        self.pixmap.adjustSize()
-        self.horizontalLayout.addWidget(self.pixmap)
+            self.pixmap.setAutoFillBackground(True)
+            self.pixmap.adjustSize()
+            self.horizontalLayout.addWidget(self.pixmap)
 
         self.label = QtGui.QLabel(self)
         self.label.setText(content)
+        self.label.setAutoFillBackground(True)
         self.label.adjustSize()
         self.horizontalLayout.addWidget(self.label)
         
@@ -40,6 +42,8 @@ class Notification(QtGui.QWidget):
         if links is not None:
             self.links = links
             self.label.linkActivated.connect(self.linkHandler)
+        
+        self._apply_style()
 
         self.timeoutTimer = QtCore.QTimer(self)
         self.timeoutTimer.setSingleShot(True)
@@ -67,6 +71,37 @@ class Notification(QtGui.QWidget):
             self.animationIn.finished.connect(self.timeoutTimer.start)
             self.timeoutTimer.timeout.connect(self.close)
     
+    def _apply_style(self):
+        label_style =  "; ".join((
+            "border: %dpx solid;" % self.border,
+            "padding: %dpx" % self.padding))
+        if self.pixmap is not None:
+            self.pixmap.setStyleSheet("; ".join((
+                "border: %dpx solid" % self.border,
+                "border-right: 0px", 
+                "padding: %dpx" % self.padding,
+                "border-top-left-radius: %dpx" % self.radius,
+                "border-bottom-left-radius: %dpx" % self.radius
+            )))
+            label_style = "; ".join((
+                label_style,
+                "border-left: 0px", 
+                "border-top-right-radius: %dpx" % self.radius,
+                "border-bottom-right-radius: %dpx" % self.radius
+            ))
+        else:
+            label_style = "; ".join((
+                label_style,
+                "border-radius: %dpx" % self.radius))
+        self.label.setStyleSheet(label_style)
+        
+    def setPalette(self, palette):
+        super(Notification, self).setPalette(palette)
+        self._apply_style()
+        self.label.setPalette(palette)
+        if self.pixmap is not None:
+            self.pixmap.setPalette(palette)
+
     def show(self):
         self.setWindowOpacity(0.0)
         super(Notification, self).show()
@@ -83,7 +118,7 @@ class Notification(QtGui.QWidget):
             callback()
 
     def width(self):
-        return self.label.width() + self.pixmap.width() + self.spacing
+        return self.label.width() + (self.pixmap and self.pixmap.width() or 0)
         
     def height(self):
         return self.label.height()
@@ -103,14 +138,7 @@ class OverlayNotifier(QtCore.QObject):
         self.notifications = []
         self.palette = parent.palette()
         self.palette.setColor(QtGui.QPalette.Window, QtCore.Qt.red)
-        #self.palette.setColor(QtGui.QPalette.Background, QtCore.Qt.red)
-        #self.palette.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
-        #self.palette.setColor(QtGui.QPalette.Base, QtCore.Qt.red)
-        #self.palette.setColor(QtGui.QPalette.Text, QtCore.Qt.red)
-        #self.palette.setColor(QtGui.QPalette.AlternateBase, QtCore.Qt.red)
-        #self.palette.setColor(QtGui.QPalette.Button, QtCore.Qt.red)
-        #self.palette.setColor(QtGui.QPalette.Text, QtCore.Qt.red)
-        #self.palette.setColor(QtGui.QPalette.Text, QtCore.Qt.red)
+        self.palette.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
         
     def eventFilter(self, obj, event):
         if event.type() == QtCore.QEvent.Resize:
@@ -130,9 +158,10 @@ class OverlayNotifier(QtCore.QObject):
             x = rect.width() - notification.width() - self.margin
             y = rect.height() - notification.height() - offset
             notification.setGeometry(x, y,
-                notification.width(), notification.height())
+                notification.width(),
+                notification.height())
             offset += (notification.height() + self.margin)
-            
+
     def _notification(self, message, title="", frmt="text", timeout=2000, icon=None,
         links={}):
         if title:
