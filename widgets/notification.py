@@ -25,16 +25,12 @@ class Notification(QtGui.QWidget):
                 )
             ))
             self.pixmap.setAutoFillBackground(True)
-            self.pixmap.adjustSize()
             self.horizontalLayout.addWidget(self.pixmap)
 
         self.label = QtGui.QLabel(self)
         self.label.setText(content)
         self.label.setAutoFillBackground(True)
-        self.label.adjustSize()
         self.horizontalLayout.addWidget(self.label)
-        
-        self.adjustSize()
         
         if links is not None:
             self.links = links
@@ -111,12 +107,6 @@ class Notification(QtGui.QWidget):
         callback = self.links.get(link, None)
         if isinstance(callback, collections.Callable):
             callback()
-
-    def width(self):
-        return self.label.width() + (self.pixmap and self.pixmap.width() or 0)
-        
-    def height(self):
-        return self.label.height()
     
     def enterEvent(self, event):
         if self.timeoutTimer.isActive():
@@ -133,8 +123,12 @@ class OverlayNotifier(QtCore.QObject):
         parent.installEventFilter(self)
         self.notifications = []
         self.palette = QtGui.QPalette()
+        self.font = QtGui.QFont()
         self.background_role = QtGui.QPalette.ToolTipBase
         self.foreground_role = QtGui.QPalette.ToolTipText
+
+    def setFont(self, font):
+        self.font = font
 
     def setBackgroundRole(self, role):
         self.background_role = role
@@ -188,10 +182,12 @@ class OverlayNotifier(QtCore.QObject):
             icon, 
             links)
 
-        # --------------- Style        
+        # --------------- Style
+        notification.setFont(self.font)
         background = self.palette.color(self.background_role).name()
         color = self.palette.color(self.foreground_role).name()
         notification.applyStyle(background, color)
+        notification.adjustSize()
         return notification
         
     def message(self, *args, **kwargs):

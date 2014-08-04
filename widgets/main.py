@@ -15,6 +15,11 @@ def notification():
     
     window = QtGui.QMainWindow()
     window.notifier = OverlayNotifier(window)
+    window.notifier.setBackgroundRole(QtGui.QPalette.Window)
+    window.notifier.setForegroundRole(QtGui.QPalette.WindowText)
+    font = window.font()
+    font.setPointSize(font.pointSize() * 0.80)
+    window.notifier.setFont(font)
     return window
 
 def locator_widget():
