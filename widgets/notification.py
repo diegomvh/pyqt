@@ -127,6 +127,7 @@ class Notification(QtGui.QWidget):
 
 class OverlayNotifier(QtCore.QObject):
     margin = 10
+    timeout = 2000
     def __init__(self, parent = None):
         super(OverlayNotifier, self).__init__(parent)
         parent.installEventFilter(self)
@@ -156,18 +157,20 @@ class OverlayNotifier(QtCore.QObject):
         self._fix_positions()
         
     def _fix_positions(self):
-        offset = self.margin
-        rect = self.parent().geometry()
+        offsets = {}
         for notification in self.notifications:
+            parent = notification.parent()
+            offset = offsets.setdefault(parent, self.margin)
+            rect = parent.geometry()
             x = rect.width() - notification.width() - self.margin
             y = rect.height() - notification.height() - offset
             notification.setGeometry(x, y,
                 notification.width(),
                 notification.height())
-            offset += (notification.height() + self.margin)
+            offsets[parent] += (notification.height() + self.margin)
 
-    def _notification(self, message, title="", frmt="text", timeout=2000, icon=None,
-        links={}):
+    def _notification(self, message, title="", frmt="text", timeout=None, icon=None,
+        links={}, widget = None):
         if title:
             title = "%s:\n" % title if frmt == "text" else "<h4>%s</h4>" % title
         message = title + message
@@ -179,7 +182,11 @@ class OverlayNotifier(QtCore.QObject):
                 message += "<a href='%s'>%s</a>" % (key, key.title())
             message += "</div>"
         
-        notification = Notification(message, self.parent(), timeout, icon, links)
+        notification = Notification(message, 
+            widget or self.parent(), 
+            timeout, 
+            icon, 
+            links)
 
         # --------------- Style        
         background = self.palette.color(self.background_role).name()
@@ -188,18 +195,22 @@ class OverlayNotifier(QtCore.QObject):
         return notification
         
     def message(self, *args, **kwargs):
+        kwargs.setdefault("timeout", self.timeout)
         notification = self._notification(*args, **kwargs)
         notification.aboutToClose.connect(self._remove_notification)
         self.notifications.insert(0, notification)
+        self._fix_positions()
         return notification
 
     def status(self, *args, **kwargs):
         notification = self._notification(*args, **kwargs)
         notification.aboutToClose.connect(self._remove_notification)
         self.notifications.insert(0, notification)
+        self._fix_positions()
         return notification
 
     def tooltip(self, *args, **kwargs):
+        kwargs.setdefault("timeout", self.timeout)
         point = kwargs.pop("point", QtCore.QPoint(self.margin,self.margin))
         notification = self._notification(*args, **kwargs)
         notification.setGeometry(point.x(), point.y(),

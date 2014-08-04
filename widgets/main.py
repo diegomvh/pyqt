@@ -59,7 +59,7 @@ def glyph_icons():
 def main(args = None):
     import os
     from PyQt4 import QtGui, QtCore
-        
+
     app = QtGui.QApplication(sys.argv)
     
     locator = locator_widget()
@@ -68,14 +68,25 @@ def main(args = None):
     button.show()
     locator.show()
     window.show()
-    window.notifier.message("Lorem ipsum dolor sit amet, consectetur adipisicing elit,\nsed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", title="Notification Test", timeout = None).show()
-    window.notifier.message("Lorem ipsum dolor sit amet, consectetur adipisicing elit,\nsed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", title="Notification 2 Test", icon = button.icon()).show()
     
-    def link_test():
-        print("yeaaa")
-    window.notifier.tooltip("Lorem ipsum dolor sit amet", title="Popup", frmt="html", point = QtCore.QPoint(1,1), links = {
-        "link": link_test
-    }).show()
+    def link(text):
+        def _link():
+            print(text)
+        return _link
+    
+    links = {
+        "link": link("link"),
+        "one": link("one")
+    }
+    status = window.notifier.status("Lorem ipsum dolor sit amet, consectetur adipisicing elit,\nsed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", title="Notification Test", links = links)
+    window.notifier.message("Lorem ipsum dolor sit amet, consectetur adipisicing elit,\nsed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", title="Notification 2 Test", icon = button.icon()).show()
+    window.notifier.tooltip("locator", widget=locator).show()
+    window.notifier.tooltip("button", widget=button).show()
+    
+    window.notifier.tooltip("Lorem ipsum dolor sit amet", title="Popup", frmt="html", point = QtCore.QPoint(0,0), links = links).show()
+    
+    status.show()
+    button.clicked.connect(lambda : status.close())
     
     return app.exec_()
 
