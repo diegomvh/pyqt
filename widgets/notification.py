@@ -15,9 +15,6 @@ class Notification(QtGui.QWidget):
         self.horizontalLayout.setMargin(0)
 
         # ------------------- Elements
-        self.padding = 5
-        self.border = 1
-        self.radius = 5
         self.pixmap = None
         if icon is not None:
             self.pixmap = QtGui.QLabel(self)
@@ -43,8 +40,6 @@ class Notification(QtGui.QWidget):
             self.links = links
             self.label.linkActivated.connect(self.linkHandler)
         
-        self._apply_style()
-
         self.timeoutTimer = QtCore.QTimer(self)
         self.timeoutTimer.setSingleShot(True)
         
@@ -71,37 +66,37 @@ class Notification(QtGui.QWidget):
             self.animationIn.finished.connect(self.timeoutTimer.start)
             self.timeoutTimer.timeout.connect(self.close)
     
-    def _apply_style(self):
+    def applyStyle(self, background, foreground, padding = 5, border = 1,
+            radius = 5):
+
         label_style =  "; ".join((
-            "border: %dpx solid;" % self.border,
-            "padding: %dpx" % self.padding))
+            "background-color: %s" % background,
+            "color: %s" % foreground,
+            "border-color: %s" % foreground,
+            "border: %dpx solid %s" % (border, foreground),
+            "padding: %dpx" % padding))
         if self.pixmap is not None:
             self.pixmap.setStyleSheet("; ".join((
-                "border: %dpx solid" % self.border,
+                "background-color: %s" % background,
+                "color: %s" % foreground,
+                "border: %dpx solid %s" % (border, foreground),
                 "border-right: 0px", 
-                "padding: %dpx" % self.padding,
-                "border-top-left-radius: %dpx" % self.radius,
-                "border-bottom-left-radius: %dpx" % self.radius
+                "padding: %dpx" % padding,
+                "border-top-left-radius: %dpx" % radius,
+                "border-bottom-left-radius: %dpx" % radius
             )))
             label_style = "; ".join((
                 label_style,
                 "border-left: 0px", 
-                "border-top-right-radius: %dpx" % self.radius,
-                "border-bottom-right-radius: %dpx" % self.radius
+                "border-top-right-radius: %dpx" % radius,
+                "border-bottom-right-radius: %dpx" % radius
             ))
         else:
             label_style = "; ".join((
                 label_style,
-                "border-radius: %dpx" % self.radius))
+                "border-radius: %dpx" % radius))
         self.label.setStyleSheet(label_style)
-        
-    def setPalette(self, palette):
-        super(Notification, self).setPalette(palette)
-        self._apply_style()
-        self.label.setPalette(palette)
-        if self.pixmap is not None:
-            self.pixmap.setPalette(palette)
-
+    
     def show(self):
         self.setWindowOpacity(0.0)
         super(Notification, self).show()
@@ -136,10 +131,19 @@ class OverlayNotifier(QtCore.QObject):
         super(OverlayNotifier, self).__init__(parent)
         parent.installEventFilter(self)
         self.notifications = []
-        self.palette = parent.palette()
-        self.palette.setColor(QtGui.QPalette.Window, QtCore.Qt.red)
-        self.palette.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
+        self.palette = QtGui.QPalette()
+        self.background_role = QtGui.QPalette.ToolTipBase
+        self.foreground_role = QtGui.QPalette.ToolTipText
+
+    def setBackgroundRole(self, role):
+        self.background_role = role
         
+    def setForegroundRole(self, role):
+        self.foreground_role = role
+        
+    def setPalette(self, palette):
+        self.palette = palette
+
     def eventFilter(self, obj, event):
         if event.type() == QtCore.QEvent.Resize:
             self._fix_positions()
@@ -176,7 +180,11 @@ class OverlayNotifier(QtCore.QObject):
             message += "</div>"
         
         notification = Notification(message, self.parent(), timeout, icon, links)
-        notification.setPalette(self.palette)
+
+        # --------------- Style        
+        background = self.palette.color(self.background_role).name()
+        color = self.palette.color(self.foreground_role).name()
+        notification.applyStyle(background, color)
         return notification
         
     def message(self, *args, **kwargs):
