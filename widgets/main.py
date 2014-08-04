@@ -91,7 +91,8 @@ def main(args = None):
     window.notifier.tooltip("Lorem ipsum dolor sit amet", title="Popup", frmt="html", point = QtCore.QPoint(0,0), links = links).show()
     
     status.show()
-    button.clicked.connect(lambda : status.close())
+    #button.clicked.connect(lambda : status.close())
+    button.clicked.connect(lambda : status.setText("hola"))
     
     return app.exec_()
 
